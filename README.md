@@ -55,11 +55,22 @@ Se você está no Mac e quer testar agora:
 # 1. Instalar dependências
 pip3 install -r requirements.txt
 
-# 2. Executar
+# 2. PRIMEIRO: Calibrar as posições dos círculos
+python3 batera/calibrate.py
+
+# 3. Depois: Executar a bateria
 python3 batera/main.py
 ```
 
 Pronto! A janela com a webcam deve abrir. Pressione ESC para sair.
+
+### Ou use o menu interativo:
+
+```bash
+python3 batera/run.py
+```
+
+Escolha a opção 1 para calibrar ou 2 para rodar.
 
 ## Instalação e execução
 
@@ -85,14 +96,30 @@ Pronto! A janela com a webcam deve abrir. Pressione ESC para sair.
 pip3 install -r requirements.txt
 ```
 
-2. Execute o programa:
+2. PRIMEIRO: Calibre as posições dos círculos:
+```bash
+python3 batera/calibrate.py
+```
+
+Na tela de calibração:
+- Você verá os círculos na tela
+- Clique em cada círculo na ordem indicada (caixa, ximbau, tom1, prato, surdo)
+- As posições serão salvas automaticamente em `batera/config.json`
+- Pressione ESC para cancelar
+
+3. Execute o programa:
 ```bash
 python3 batera/main.py
 ```
 
-3. A janela da webcam vai abrir mostrando os círculos da bateria
+4. A janela da webcam vai abrir mostrando os círculos calibrados
 
-4. Pressione ESC para sair
+5. Pressione ESC para sair
+
+**Características:**
+- Câmera espelhada (como um espelho real)
+- Posições calibráveis
+- Configuração salva para próximas execuções
 
 **Nota:** Você já tem Python instalado no Mac. Se não tiver, instale com:
 ```bash
@@ -110,14 +137,24 @@ brew install python@3.11
 pip install -r requirements.txt
 ```
 
-3. Execute o programa:
+3. PRIMEIRO: Calibre as posições dos círculos:
+```bash
+python batera/calibrate.py
+```
+
+Na tela de calibração:
+- Você verá os círculos na tela
+- Clique em cada círculo na ordem indicada (caixa, ximbau, tom1, prato, surdo)
+- As posições serão salvas automaticamente em `batera/config.json`
+
+4. Execute o programa:
 ```bash
 python batera/main.py
 ```
 
-4. A janela da webcam vai abrir mostrando os círculos da bateria
+5. A janela da webcam vai abrir mostrando os círculos calibrados
 
-5. Pressione ESC para sair
+6. Pressione ESC para sair
 
 **Docker no Windows NÃO FUNCIONA** - Requer WSL2, configuração complexa e mesmo assim a webcam não funciona.
 

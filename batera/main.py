@@ -4,27 +4,61 @@ import math
 import pygame
 import threading
 import time
+import os
+import json
 
+# Obtém o diretório onde este arquivo está localizado
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SONS_DIR = os.path.join(BASE_DIR, "sons")
+CONFIG_FILE = os.path.join(BASE_DIR, "config.json")
+
+# Posições padrão
+POSICOES_PADRAO = {
+    "caixa": (781, 615),
+    "ximbau": (950, 475),
+    "tom1": (780, 335),
+    "prato": (580, 335),
+    "surdo": (469, 535)
+}
+
+# Carrega configuração se existir
+def carregar_config():
+    if os.path.exists(CONFIG_FILE):
+        try:
+            with open(CONFIG_FILE, 'r') as f:
+                config = json.load(f)
+            print("Configuração carregada de:", CONFIG_FILE)
+            posicoes = config.get("posicoes", POSICOES_PADRAO)
+            # Converte listas para tuplas
+            posicoes = {k: tuple(v) if isinstance(v, list) else v for k, v in posicoes.items()}
+            return posicoes, config.get("espelhar", True)
+        except Exception as e:
+            print(f"Erro ao carregar configuração: {e}")
+            print("Usando posições padrão")
+            return POSICOES_PADRAO, True
+    return POSICOES_PADRAO, True
+
+posicoes_config, ESPELHAR_CAMERA = carregar_config()
 
 # Lista de círculos na ordem que devem ser tocados
 circulos = [
-    {"pos": (781, 615), "raio": 50, "encostou": False,"som":"caixa"},
-    {"pos": (950, 475), "raio": 50, "encostou": False,"som":"ximbau"},
-    {"pos": (780, 335), "raio": 50, "encostou": False,"som":"tom1"},
-    {"pos": (580, 335), "raio": 50, "encostou": False,"som":"prato"},
-    {"pos": (469, 535), "raio": 50, "encostou": False,"som":"surdo"}
+    {"pos": posicoes_config["caixa"], "raio": 50, "encostou": False,"som":"caixa"},
+    {"pos": posicoes_config["ximbau"], "raio": 50, "encostou": False,"som":"ximbau"},
+    {"pos": posicoes_config["tom1"], "raio": 50, "encostou": False,"som":"tom1"},
+    {"pos": posicoes_config["prato"], "raio": 50, "encostou": False,"som":"prato"},
+    {"pos": posicoes_config["surdo"], "raio": 50, "encostou": False,"som":"surdo"}
 ]
 
 # Inicializa o mixer
 pygame.mixer.init()
 
-# Carrega os sons
+# Carrega os sons usando caminhos absolutos
 sons = {
-    "caixa": pygame.mixer.Sound("sons/caixa.wav"),
-    "ximbau": pygame.mixer.Sound("sons/ximbau.wav"),
-    "tom1": pygame.mixer.Sound("sons/tom1.wav"),
-    "prato": pygame.mixer.Sound("sons/prato.wav"),
-    "surdo": pygame.mixer.Sound("sons/surdo.wav")
+    "caixa": pygame.mixer.Sound(os.path.join(SONS_DIR, "caixa.wav")),
+    "ximbau": pygame.mixer.Sound(os.path.join(SONS_DIR, "ximbau.wav")),
+    "tom1": pygame.mixer.Sound(os.path.join(SONS_DIR, "tom1.wav")),
+    "prato": pygame.mixer.Sound(os.path.join(SONS_DIR, "prato.wav")),
+    "surdo": pygame.mixer.Sound(os.path.join(SONS_DIR, "surdo.wav"))
 }
 
 
@@ -57,6 +91,10 @@ while True:
     if not ret:
         break
 
+    # Espelha a câmera (como um espelho)
+    if ESPELHAR_CAMERA:
+        frame = cv2.flip(frame, 1)
+
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
@@ -86,11 +124,10 @@ while True:
                         circulo["encostou"] = False  # permite detectar novamente se o objeto sair e voltar
 
 
-    cv2.circle(frame, (781, 615), 50, (0, 255, 0), 2) # -> caixa
-    cv2.circle(frame, (950, 475), 50, (0, 255, 0), 2) # -> ximbau
-    cv2.circle(frame, (780, 335), 50, (0, 255, 0), 2) # -> tom 1
-    cv2.circle(frame, (580, 335), 50, (0, 255, 0), 2) # -> prato
-    cv2.circle(frame, (469, 535), 50, (0, 255, 0), 2) # -> surdo
+    # Desenha os círculos nas posições calibradas
+    for circulo in circulos:
+        x, y = circulo["pos"]
+        cv2.circle(frame, (int(x), int(y)), circulo["raio"], (0, 255, 0), 2)
 
 
     
