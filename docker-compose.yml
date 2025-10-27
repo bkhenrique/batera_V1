@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  bateria:
+    build: .
+    container_name: bateria_virtual
+    privileged: true
+    environment:
+      - DISPLAY=${DISPLAY}
+      - PULSE_SERVER=unix:/run/user/1000/pulse/native
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /run/user/1000/pulse:/run/user/1000/pulse
+      - /dev/video0:/dev/video0
+    devices:
+      - /dev/video0:/dev/video0
+      - /dev/snd:/dev/snd
+    network_mode: host
+
