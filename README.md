@@ -63,51 +63,45 @@ Pronto! A janela com a webcam deve abrir. Pressione ESC para sair.
 
 ## Instalação e execução
 
-### IMPORTANTE: Escolha o método adequado para seu sistema
+### IMPORTANTE: Docker NÃO funciona no Mac e Windows
 
-- **Mac e Windows**: Recomendado executar LOCALMENTE (sem Docker)
-- **Linux**: Docker funciona perfeitamente
+**Por que Docker não funciona?**
+- A webcam não é acessível pelo Docker no Mac/Windows
+- A interface gráfica precisa de configuração complexa (XQuartz no Mac)
+- Docker roda em uma VM que não compartilha dispositivos de hardware facilmente
 
-### Mac (Recomendado: Execução Local)
+**Solução: Execute LOCALMENTE**
 
-1. Instale o Python 3.11 ou superior:
-```bash
-brew install python@3.11
-```
+| Sistema Operacional | Método Recomendado |
+|---------------------|-------------------|
+| Mac                 | Execução Local    |
+| Windows             | Execução Local    |
+| Linux               | Docker ou Local   |
 
-2. Instale as dependências:
+### Mac - Execução Local (ÚNICO MÉTODO QUE FUNCIONA)
+
+1. Instale as dependências:
 ```bash
 pip3 install -r requirements.txt
 ```
 
-3. Execute o programa:
+2. Execute o programa:
 ```bash
 python3 batera/main.py
 ```
 
-#### Mac com Docker (Avançado - Não Recomendado)
+3. A janela da webcam vai abrir mostrando os círculos da bateria
 
-O Docker no Mac tem limitações com webcam e GUI. Se ainda quiser tentar:
+4. Pressione ESC para sair
 
-1. Instale o XQuartz:
+**Nota:** Você já tem Python instalado no Mac. Se não tiver, instale com:
 ```bash
-brew install --cask xquartz
+brew install python@3.11
 ```
 
-2. Abra o XQuartz e vá em Preferências > Segurança > Marque "Permitir conexões de clientes de rede"
+**Docker no Mac NÃO FUNCIONA** - A webcam não é acessível e a interface gráfica não funciona corretamente.
 
-3. Reinicie o Mac
-
-4. No terminal:
-```bash
-xhost +localhost
-export DISPLAY=:0
-docker-compose up
-```
-
-Nota: A webcam pode não funcionar corretamente no Docker no Mac.
-
-### Windows (Recomendado: Execução Local)
+### Windows - Execução Local (ÚNICO MÉTODO QUE FUNCIONA)
 
 1. Instale o Python 3.11 ou superior do site oficial: https://www.python.org/downloads/
 
@@ -121,9 +115,11 @@ pip install -r requirements.txt
 python batera/main.py
 ```
 
-#### Windows com Docker (Avançado - Não Recomendado)
+4. A janela da webcam vai abrir mostrando os círculos da bateria
 
-Requer WSL2 e configuração complexa. Recomendamos executar localmente.
+5. Pressione ESC para sair
+
+**Docker no Windows NÃO FUNCIONA** - Requer WSL2, configuração complexa e mesmo assim a webcam não funciona.
 
 ### Linux (Recomendado: Docker)
 
@@ -179,17 +175,36 @@ python batera/main.py
 
 ## Solução de problemas
 
-### Docker: Webcam não detectada
+### Mac/Windows: Webcam não abre
+- Verifique se outra aplicação está usando a webcam
+- Feche Zoom, Teams, Skype, etc.
+- Reinicie o terminal e tente novamente
+
+### Mac/Windows: Erro ao importar cv2
+```bash
+pip3 uninstall opencv-python
+pip3 install opencv-python
+```
+
+### Linux com Docker: Webcam não detectada
 Verifique se a webcam está em `/dev/video0`:
 ```bash
 ls -l /dev/video*
 ```
 
-### Docker: Sem áudio
+Se estiver em outro dispositivo, edite o `docker-compose.yml`.
+
+### Linux com Docker: Sem áudio
 Certifique-se de que o PulseAudio está rodando:
 ```bash
 pulseaudio --check
 ```
 
-### Docker: Erro de display
+### Linux com Docker: Erro de display
 Verifique se executou `xhost +local:docker` antes de rodar o container.
+
+### Erro: "No module named 'cv2'" ou similar
+Instale as dependências novamente:
+```bash
+pip3 install -r requirements.txt
+```
